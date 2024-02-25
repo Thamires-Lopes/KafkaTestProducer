@@ -9,6 +9,18 @@ namespace KafkaTestProducer
     {
         public static void Main(string[] args)
         {
+            var app = Configure(args);
+
+            app.MapPost("/sendMessageProducer", async ([FromServices] KafkaProducerService service, [FromBody] User user) =>
+            {
+                return await service.SendMessage(user);
+            });
+
+            app.Run();
+        }
+
+        private static WebApplication Configure(string[] args)
+        {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -31,21 +43,7 @@ namespace KafkaTestProducer
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
-            app.MapPost("/sendMessageProducer", async ([FromServices] KafkaProducerService service, [FromBody] User user) =>
-            {
-                return await service.SendMessage(user);
-            });
-
-
-            app.MapGet("/weatherforecast", (HttpContext httpContext) =>
-            {
-                
-            })
-            .WithName("GetWeatherForecast")
-            .WithOpenApi();
-
-            app.Run();
+            return app;
         }
     }
 }
